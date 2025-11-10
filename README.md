@@ -149,7 +149,7 @@ I’m **Madhan Kumar Tammineni**, a Master’s student in Computer Science at th
 I’m passionate about **data science, AI, and building practical tools** that bridge analytical thinking with real-world impact.  
 This project helped me deepen my understanding of forecasting and its potential role in decision-making systems.
 
-📧 [tammineni.madhan.kumar@gmail.com](mailto:madhanktam@gmail.com)  
+📧 [madhanktam@gmail.com](mailto:madhanktam@gmail.com)  
 🔗 [LinkedIn](https://www.linkedin.com/in/madhan-kumar-tammineni-4487a4197)  
 💻 [GitHub](https://github.com/Madhan120-prog)
 
