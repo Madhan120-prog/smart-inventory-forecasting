@@ -95,6 +95,16 @@ For **Store 1**, the model predicted that:
 
 ---
 
+## ▶️ How to Run
+```bash
+pip install -r requirements.txt
+pytest                      # unit tests for forecast.py (Prophet test skips if not installed)
+jupyter notebook notebooks/ # open the forecasting notebooks
+```
+Reusable logic lives in `forecast.py` (`fit_forecast`, `summarize_change`, `top_n_items`, `mape`).
+
+---
+
 ## 🛠️ Tools & Libraries Used  
 | Category | Libraries / Tools |
 |-----------|-------------------|

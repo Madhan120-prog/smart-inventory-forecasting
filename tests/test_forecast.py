@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from forecast import summarize_change, top_n_items
+from forecast import mape, summarize_change, top_n_items
 
 
 def test_top_n_items_orders_descending_and_limits():
@@ -29,3 +29,9 @@ def test_fit_forecast_length_and_no_nans():
     out = fit_forecast(df, periods=10)
     assert len(out) == 70
     assert not out["yhat"].isna().any()
+
+
+def test_mape_ignores_zero_actuals():
+    actual = pd.Series([100.0, 0.0, 50.0])
+    predicted = pd.Series([110.0, 5.0, 45.0])
+    assert mape(actual, predicted) == pytest.approx(10.0)

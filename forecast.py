@@ -38,3 +38,9 @@ def summarize_change(history: pd.DataFrame, forecast: pd.DataFrame, window: int 
 def top_n_items(summary: pd.DataFrame, n: int = 5, by: str = "forecasted_sales") -> pd.DataFrame:
     """Return the ``n`` rows of ``summary`` with the largest ``by`` value, descending."""
     return summary.sort_values(by=by, ascending=False).head(n).reset_index(drop=True)
+
+
+def mape(actual: pd.Series, predicted: pd.Series) -> float:
+    """Mean absolute percentage error (%), ignoring points where ``actual`` is zero."""
+    mask = actual != 0
+    return float(((actual[mask] - predicted[mask]).abs() / actual[mask].abs()).mean() * 100)
