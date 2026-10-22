@@ -144,6 +144,17 @@ smart-inventory-forecasting/
 
 ---
 
+## ✅ Weekly Task List (updated 2026-10-22)
+**Focus:** turn the notebook logic into reusable, tested Python (the repo currently has no `.py` files or tests).
+
+- [ ] Extract the per-product Prophet fit/forecast code into `src/forecast.py` with type hints (`fit_and_forecast(df, periods) -> pd.DataFrame`).
+- [ ] Add `tests/test_forecast.py` (pytest) using a small synthetic series: check output length, no negative demand, and columns `ds`, `yhat`.
+- [ ] Add `requirements.txt` and fix the README folder tree / notebook filenames (`01_Automobile_Demand_Forecasting.ipynb` is listed but the file is named `Automobile Demand Forecasting .ipynb`).
+- [ ] Replace placeholder `user-images.githubusercontent.com/example/...` image links with real exported charts in `outputs/`.
+- [ ] Stretch: add a naive/seasonal-naive baseline and compare MAPE against Prophet.
+
+---
+
 ## 🙋‍♂️ About Me  
 I’m **Madhan Kumar Tammineni**, a Master’s student in Computer Science at the **University of Memphis**.  
 I’m passionate about **data science, AI, and building practical tools** that bridge analytical thinking with real-world impact.  
