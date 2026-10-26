@@ -44,3 +44,17 @@ def mape(actual: pd.Series, predicted: pd.Series) -> float:
     """Mean absolute percentage error (%), ignoring points where ``actual`` is zero."""
     mask = actual != 0
     return float(((actual[mask] - predicted[mask]).abs() / actual[mask].abs()).mean() * 100)
+
+
+def holdout_split(df: pd.DataFrame, holdout: int = 90) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Split a dated series into (train, test), reserving the last ``holdout`` rows for testing."""
+    ordered = df.sort_values("date").reset_index(drop=True)
+    return ordered.iloc[:-holdout], ordered.iloc[-holdout:]
+
+
+def backtest_mape(df: pd.DataFrame, holdout: int = 90) -> float:
+    """Fit on all but the last ``holdout`` days and return the MAPE (%) on those days."""
+    train, test = holdout_split(df, holdout)
+    forecast = fit_forecast(train, periods=holdout)
+    predicted = forecast.tail(holdout)["yhat"].reset_index(drop=True)
+    return mape(test["sales"].reset_index(drop=True), predicted)

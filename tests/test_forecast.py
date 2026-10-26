@@ -35,3 +35,12 @@ def test_mape_ignores_zero_actuals():
     actual = pd.Series([100.0, 0.0, 50.0])
     predicted = pd.Series([110.0, 5.0, 45.0])
     assert mape(actual, predicted) == pytest.approx(10.0)
+
+
+def test_holdout_split_keeps_last_rows_for_test():
+    from forecast import holdout_split
+
+    df = pd.DataFrame({"date": pd.date_range("2020-01-01", periods=10)[::-1], "sales": range(10)})
+    train, test = holdout_split(df, holdout=3)
+    assert len(train) == 7 and len(test) == 3
+    assert train["date"].max() < test["date"].min()
