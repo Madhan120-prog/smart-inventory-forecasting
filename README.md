@@ -144,6 +144,18 @@ smart-inventory-forecasting/
 
 ---
 
+## ✅ Next Steps (updated 2026-11-01)  
+Status: no commits since 2025-11-10 — the project is stalled at the notebook stage.  
+This week's focus: move forecasting logic out of notebooks into tested Python code.
+
+- [ ] Extract the Prophet train/forecast loop into `src/forecast.py` with type hints (e.g. `forecast_product(df, product, horizon=30) -> pd.DataFrame`).
+- [ ] Add `tests/test_forecast.py` (pytest) covering output shape, horizon length and non-negative forecasts on a tiny synthetic series.
+- [ ] Add `requirements.txt` (prophet, pandas, matplotlib, pytest) so the notebooks run reproducibly.
+- [ ] Fix the placeholder sample-chart image link in Part 1 with a real saved plot in `outputs/`.
+- [ ] Later: compare Prophet vs. ARIMA with MAPE on a holdout set.
+
+---
+
 ## 🙋‍♂️ About Me  
 I’m **Madhan Kumar Tammineni**, a Master’s student in Computer Science at the **University of Memphis**.  
 I’m passionate about **data science, AI, and building practical tools** that bridge analytical thinking with real-world impact.  
