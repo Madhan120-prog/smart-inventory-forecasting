@@ -144,6 +144,18 @@ smart-inventory-forecasting/
 
 ---
 
+## ✅ Weekly Task List (updated 2026-11-02)
+
+**Focus this week: make the forecasting code reproducible and testable (Python skills: refactoring, unit tests, type hints).**
+
+- [ ] **Extract notebook logic into `src/forecast.py`** — functions like `load_sales(path) -> pd.DataFrame`, `fit_prophet(df, horizon) -> pd.DataFrame`, `top_n_items(forecast, n=5)` with type hints and docstrings.
+- [ ] **Add `tests/test_forecast.py` (pytest)** — cover `top_n_items` and the %-change stock-risk calculation using a tiny synthetic DataFrame.
+- [ ] Add `requirements.txt` (prophet, pandas, numpy, matplotlib, seaborn, pytest).
+- [ ] Fix README: folder structure lists `01_Automobile_Demand_Forecasting.ipynb` but the file is `Automobile Demand Forecasting .ipynb` (rename it); replace placeholder `user-images.githubusercontent.com/example/...` images with real charts saved in `outputs/`.
+- [ ] Next up: baseline vs Prophet comparison (naive / moving average, MAPE) before trying ARIMA/LSTM.
+
+---
+
 ## 🙋‍♂️ About Me  
 I’m **Madhan Kumar Tammineni**, a Master’s student in Computer Science at the **University of Memphis**.  
 I’m passionate about **data science, AI, and building practical tools** that bridge analytical thinking with real-world impact.  
