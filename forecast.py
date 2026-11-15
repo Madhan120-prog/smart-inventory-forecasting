@@ -58,3 +58,23 @@ def backtest_mape(df: pd.DataFrame, holdout: int = 90) -> float:
     forecast = fit_forecast(train, periods=holdout)
     predicted = forecast.tail(holdout)["yhat"].reset_index(drop=True)
     return mape(test["sales"].reset_index(drop=True), predicted)
+
+
+def seasonal_naive_forecast(history: pd.Series, periods: int, season: int = 7) -> pd.Series:
+    """Baseline forecast: repeat the last ``season`` observed values for ``periods`` steps.
+
+    With ``season=7`` on daily data this predicts "same as the same weekday last week",
+    which is the standard baseline Prophet should beat to be worth its complexity.
+    """
+    if len(history) < season:
+        raise ValueError(f"need at least {season} observations, got {len(history)}")
+    last_season = history.iloc[-season:].to_numpy()
+    values = [last_season[i % season] for i in range(periods)]
+    return pd.Series(values, name="yhat", dtype=float)
+
+
+def backtest_baseline_mape(df: pd.DataFrame, holdout: int = 90, season: int = 7) -> float:
+    """Seasonal-naive counterpart of ``backtest_mape`` (no Prophet needed)."""
+    train, test = holdout_split(df, holdout)
+    predicted = seasonal_naive_forecast(train["sales"], periods=holdout, season=season)
+    return mape(test["sales"].reset_index(drop=True), predicted)

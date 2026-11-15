@@ -44,3 +44,26 @@ def test_holdout_split_keeps_last_rows_for_test():
     train, test = holdout_split(df, holdout=3)
     assert len(train) == 7 and len(test) == 3
     assert train["date"].max() < test["date"].min()
+
+
+def test_seasonal_naive_repeats_last_season():
+    from forecast import seasonal_naive_forecast
+
+    history = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0])
+    out = seasonal_naive_forecast(history, periods=5, season=3)
+    assert list(out) == [3.0, 4.0, 5.0, 3.0, 4.0]
+
+
+def test_seasonal_naive_rejects_short_history():
+    from forecast import seasonal_naive_forecast
+
+    with pytest.raises(ValueError):
+        seasonal_naive_forecast(pd.Series([1.0, 2.0]), periods=3, season=7)
+
+
+def test_backtest_baseline_mape_is_zero_on_perfectly_weekly_series():
+    from forecast import backtest_baseline_mape
+
+    dates = pd.date_range("2020-01-01", periods=42)
+    df = pd.DataFrame({"date": dates, "sales": [10.0 + (i % 7) for i in range(42)]})
+    assert backtest_baseline_mape(df, holdout=14, season=7) == pytest.approx(0.0)
