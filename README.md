@@ -105,6 +105,23 @@ Reusable logic lives in `forecast.py` (`fit_forecast`, `summarize_change`, `top_
 
 ---
 
+## 📏 Does Prophet Beat a Simple Baseline?
+Backtest on the last 90 days of five store/item series from `data/train.csv`, comparing Prophet
+against a seasonal-naive baseline (repeat last week's daily sales). Lower MAPE is better.
+
+| Store | Item | Prophet MAPE (%) | Seasonal-naive MAPE (%) |
+|------:|-----:|-----------------:|------------------------:|
+| 1  | 1  | 23.26 | 39.13 |
+| 1  | 15 | 9.68  | 19.57 |
+| 2  | 28 | 9.26  | 24.97 |
+| 5  | 10 | 12.16 | 21.96 |
+| 10 | 45 | 11.00 | 22.17 |
+
+Prophet roughly halves the baseline's error on every series tested. Reproduce with
+`python scripts/compare_baseline.py` (writes `outputs/baseline_comparison.csv`).
+
+---
+
 ## 🛠️ Tools & Libraries Used  
 | Category | Libraries / Tools |
 |-----------|-------------------|
