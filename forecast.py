@@ -1,7 +1,11 @@
 """Forecasting helpers extracted from notebooks/02_store_item_demand_forecast.ipynb."""
 from __future__ import annotations
 
+from collections.abc import Callable, Iterable
+
 import pandas as pd
+
+Forecaster = Callable[[pd.DataFrame, int], pd.DataFrame]
 
 
 def fit_forecast(df: pd.DataFrame, periods: int = 90) -> pd.DataFrame:
@@ -33,6 +37,48 @@ def summarize_change(history: pd.DataFrame, forecast: pd.DataFrame, window: int 
         "forecasted_sales": round(future_mean, 2),
         "change": round(future_mean - past_mean, 2),
     }
+
+
+def select_series(data: pd.DataFrame, store: int, item: int) -> pd.DataFrame:
+    """Return the ``date``/``sales`` rows for one store-item pair, sorted by date."""
+    mask = (data["store"] == store) & (data["item"] == item)
+    if not mask.any():
+        raise ValueError(f"no rows for store={store}, item={item}")
+    return data.loc[mask, ["date", "sales"]].sort_values("date").reset_index(drop=True)
+
+
+def build_forecast_summary(
+    data: pd.DataFrame,
+    store: int,
+    items: Iterable[int],
+    periods: int = 90,
+    forecaster: Forecaster | None = None,
+) -> pd.DataFrame:
+    """Forecast each item in ``store`` and tabulate past vs forecasted mean sales.
+
+    This is the per-item loop from the notebook. ``forecaster`` defaults to
+    :func:`fit_forecast` (Prophet); tests pass a cheap stand-in instead.
+
+    Returns:
+        Columns ``Item ID``, ``Past Sales``, ``Forecasted Sales``, ``Change``,
+        sorted by ``Change`` descending (the layout of
+        ``outputs/store1_top5_forecast_summary.csv``).
+    """
+    fit = forecaster or fit_forecast
+    rows = []
+    for item in items:
+        history = select_series(data, store, item)
+        stats = summarize_change(history, fit(history, periods), window=periods)
+        rows.append(
+            {
+                "Item ID": item,
+                "Past Sales": stats["past_sales"],
+                "Forecasted Sales": stats["forecasted_sales"],
+                "Change": stats["change"],
+            }
+        )
+    summary = pd.DataFrame(rows, columns=["Item ID", "Past Sales", "Forecasted Sales", "Change"])
+    return summary.sort_values("Change", ascending=False).reset_index(drop=True)
 
 
 def top_n_items(summary: pd.DataFrame, n: int = 5, by: str = "forecasted_sales") -> pd.DataFrame:

@@ -67,3 +67,43 @@ def test_backtest_baseline_mape_is_zero_on_perfectly_weekly_series():
     dates = pd.date_range("2020-01-01", periods=42)
     df = pd.DataFrame({"date": dates, "sales": [10.0 + (i % 7) for i in range(42)]})
     assert backtest_baseline_mape(df, holdout=14, season=7) == pytest.approx(0.0)
+
+
+def _store_data() -> pd.DataFrame:
+    dates = pd.date_range("2020-01-01", periods=10)
+    frames = [
+        pd.DataFrame({"date": dates, "store": 1, "item": item, "sales": float(item * 10)})
+        for item in (1, 2, 3)
+    ]
+    frames.append(pd.DataFrame({"date": dates, "store": 2, "item": 1, "sales": 999.0}))
+    return pd.concat(frames, ignore_index=True).sample(frac=1, random_state=0)
+
+
+def test_select_series_filters_and_sorts():
+    from forecast import select_series
+
+    out = select_series(_store_data(), store=1, item=2)
+    assert list(out.columns) == ["date", "sales"]
+    assert len(out) == 10 and (out["sales"] == 20.0).all()
+    assert out["date"].is_monotonic_increasing
+
+
+def test_select_series_rejects_unknown_pair():
+    from forecast import select_series
+
+    with pytest.raises(ValueError):
+        select_series(_store_data(), store=3, item=1)
+
+
+def test_build_forecast_summary_with_stub_forecaster():
+    from forecast import build_forecast_summary
+
+    def grow_by_item(history: pd.DataFrame, periods: int) -> pd.DataFrame:
+        # Pretend each item's demand rises by its own base level / 10.
+        base = history["sales"].iloc[0]
+        return pd.DataFrame({"yhat": [base + base / 10] * periods})
+
+    summary = build_forecast_summary(_store_data(), store=1, items=[1, 2, 3], periods=5, forecaster=grow_by_item)
+    assert list(summary.columns) == ["Item ID", "Past Sales", "Forecasted Sales", "Change"]
+    assert list(summary["Item ID"]) == [3, 2, 1]  # sorted by Change, largest first
+    assert summary.loc[0].to_dict() == {"Item ID": 3, "Past Sales": 30.0, "Forecasted Sales": 33.0, "Change": 3.0}
