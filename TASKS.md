@@ -1,6 +1,6 @@
 # Smart Inventory Forecasting: Task List
 
-_Last updated by the weekly review routine: 2026-11-20._
+_Last updated by the weekly review routine: 2026-11-21._
 
 This file replaces the separate weekly-plan branches (`weekly-plan-2026-10-20`,
 `weekly/forecasting-next-steps`, `weekly/next-steps`, `claude/weekly-python-review`,
@@ -25,17 +25,23 @@ so they can be deleted. Track everything here on `feat/forecast-module`.
       `store1_top5_forecast_summary.csv` changed by at most 0.02 on items 2 and 5. The original inline code gives the
       same new numbers under Prophet 1.5.0, so the change comes from the Prophet version, not the refactor. (2026-11-20)
 - [x] `ruff check .` (rules E, F, I; config in `ruff.toml`, notebooks excluded) added to the CI workflow. Passes. (2026-11-20)
+- [x] Pinned `requirements.txt` (prophet 1.5.0, cmdstanpy 1.3.2, pandas 3.1.1, numpy 2.4.6, pytest 9.2.0, ruff 0.17.6);
+      CI installs the same pandas/pytest/ruff versions. Re-ran `scripts/compare_baseline.py` with the pins: output
+      identical to the committed `baseline_comparison.csv`. Tests: 11 passed; ruff: clean. (2026-11-21)
+- [x] README folder structure fixed: real notebook names, plus `forecast.py`, `scripts/`, `tests/`, `TASKS.md`,
+      rendered as a code block so the tree no longer collapses into one line. (2026-11-21)
 
 ## Next step (pick this up first)
 - [ ] **Open a PR from `feat/forecast-module` into `main` and merge it.** This is the blocker: `main`
       hasn't changed since 2025-11-10, so none of the module, tests or results show on the public repo.
       Takes ~5 minutes: review the diff on GitHub, then merge.
       The PR now gets a green/red CI check, so you can see the tests pass before merging.
-- [ ] **Pin library versions in `requirements.txt`** (e.g. `prophet==1.5.0`, plus pandas) so re-running the notebook
-      gives the same numbers every time. This week's re-run showed results move slightly between Prophet versions.
+- [ ] **Add a `test_build_forecast_summary_with_prophet` smoke test** on one real series (skips without Prophet), so the
+      end-to-end path the notebook uses is covered, not just the stubbed version. ~20 lines in `tests/test_forecast.py`.
 
 ## Housekeeping
-- [ ] Fix the README folder structure: notebook names don't match (`Automobile Demand Forecasting .ipynb` has a trailing space)
+- [ ] Rename `notebooks/Automobile Demand Forecasting .ipynb` to `01_automobile_demand_forecast.ipynb` (trailing space, no
+      number) and update the README tree to match
 - [ ] Replace the placeholder `user-images.githubusercontent.com/example/...` image links with real charts from `outputs/`
 - [ ] Decide whether the 17 MB `data/train.csv` stays in git (or `.gitignore` it and add a download note)
 - [ ] Delete the five stale weekly-plan branches listed above

@@ -14,6 +14,6 @@ jobs:
           python-version: "3.12"
           cache: pip
       # Prophet is heavy to install; its one test is skipped automatically without it.
-      - run: pip install pandas pytest ruff
+      - run: pip install pandas==3.1.1 pytest==9.2.0 ruff==0.17.6
       - run: ruff check .
       - run: python -m pytest -q

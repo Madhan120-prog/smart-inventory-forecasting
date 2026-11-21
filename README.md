@@ -135,24 +135,30 @@ Prophet roughly halves the baseline's error on every series tested. Reproduce wi
 
 ## 🧮 Folder Structure  
 
+```text
 smart-inventory-forecasting/
-│
+├── forecast.py                  # reusable forecasting + evaluation helpers
 ├── notebooks/
-│   ├── 01_Automobile_Demand_Forecasting.ipynb
-│   └── 02_Store_Item_Demand_Forecasting.ipynb
-│
+│   ├── Automobile Demand Forecasting .ipynb
+│   └── 02_store_item_demand_forecast.ipynb
+├── scripts/
+│   └── compare_baseline.py      # Prophet vs seasonal-naive backtest
+├── tests/
+│   └── test_forecast.py
 ├── data/
 │   ├── sales_data.csv
 │   ├── train.csv
 │   ├── test.csv
 │   └── sample_submission.csv
-│
 ├── outputs/
-│   ├── product_demand_summary.csv
+│   ├── baseline_comparison.csv
 │   ├── Brake Pads_forecast.csv
-│   ├── store1_top5_forecast_summary.csv
-│
+│   ├── product_demand_summary.csv
+│   └── store1_top5_forecast_summary.csv
+├── requirements.txt             # pinned versions
+├── TASKS.md
 └── README.md
+```
 
 ---
 
