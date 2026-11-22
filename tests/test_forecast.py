@@ -107,3 +107,28 @@ def test_build_forecast_summary_with_stub_forecaster():
     assert list(summary.columns) == ["Item ID", "Past Sales", "Forecasted Sales", "Change"]
     assert list(summary["Item ID"]) == [3, 2, 1]  # sorted by Change, largest first
     assert summary.loc[0].to_dict() == {"Item ID": 3, "Past Sales": 30.0, "Forecasted Sales": 33.0, "Change": 3.0}
+
+
+def test_build_forecast_summary_with_prophet_matches_committed_output():
+    """End-to-end smoke test: the notebook's real Prophet path on store 1, item 1.
+
+    Re-derives one row of outputs/store1_top5_forecast_summary.csv from data/train.csv,
+    so a change to forecast.py or the pinned Prophet version that shifts results is caught.
+    """
+    pytest.importorskip("prophet")
+    from pathlib import Path
+
+    from forecast import build_forecast_summary
+
+    root = Path(__file__).resolve().parent.parent
+    train = pd.read_csv(root / "data" / "train.csv", parse_dates=["date"])
+    expected = pd.read_csv(root / "outputs" / "store1_top5_forecast_summary.csv").set_index("Item ID").loc[1]
+
+    summary = build_forecast_summary(train, store=1, items=[1], periods=90)
+
+    assert list(summary.columns) == ["Item ID", "Past Sales", "Forecasted Sales", "Change"]
+    row = summary.loc[0]
+    assert row["Item ID"] == 1
+    assert row["Past Sales"] == pytest.approx(expected["Past Sales"], abs=0.01)
+    assert row["Forecasted Sales"] == pytest.approx(expected["Forecasted Sales"], abs=0.05)
+    assert row["Change"] == pytest.approx(expected["Change"], abs=0.05)
