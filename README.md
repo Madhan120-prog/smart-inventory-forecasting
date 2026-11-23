@@ -139,7 +139,7 @@ Prophet roughly halves the baseline's error on every series tested. Reproduce wi
 smart-inventory-forecasting/
 ├── forecast.py                  # reusable forecasting + evaluation helpers
 ├── notebooks/
-│   ├── Automobile Demand Forecasting .ipynb
+│   ├── 01_automobile_demand_forecast.ipynb
 │   └── 02_store_item_demand_forecast.ipynb
 ├── scripts/
 │   └── compare_baseline.py      # Prophet vs seasonal-naive backtest

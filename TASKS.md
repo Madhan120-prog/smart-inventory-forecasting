@@ -1,6 +1,6 @@
 # Smart Inventory Forecasting: Task List
 
-_Last updated by the weekly review routine: 2026-11-22._
+_Last updated by the weekly review routine: 2026-11-23._
 
 This file replaces the separate weekly-plan branches (`weekly-plan-2026-10-20`,
 `weekly/forecasting-next-steps`, `weekly/next-steps`, `claude/weekly-python-review`,
@@ -34,16 +34,20 @@ so they can be deleted. Track everything here on `feat/forecast-module`.
       store 1 / item 1 from `data/train.csv` and checks it against the committed `store1_top5_forecast_summary.csv` row
       (±0.05). Skips without Prophet, so CI is unaffected. Tests: 12 passed with Prophet; 10 passed, 2 skipped without. (2026-11-22)
 
+- [x] Renamed `notebooks/Automobile Demand Forecasting .ipynb` to `notebooks/01_automobile_demand_forecast.ipynb`
+      (no more trailing space) and updated the README tree. Tests: 10 passed, 2 skipped (no Prophet); ruff: clean. (2026-11-23)
+
 ## Next step (pick this up first)
-- [ ] **Open a PR from `feat/forecast-module` into `main` and merge it.** This is the blocker: `main`
-      hasn't changed since 2025-11-10, so none of the module, tests or results show on the public repo.
+- [ ] **Open a PR from `feat/forecast-module` into `main` and merge it.** This is still the blocker (carried over
+      since October): `main` hasn't changed since 2025-11-10, so none of the module, tests or results show on the public repo.
       Takes ~5 minutes: review the diff on GitHub, then merge.
       The PR now gets a green/red CI check, so you can see the tests pass before merging.
-- [ ] **Rename `notebooks/Automobile Demand Forecasting .ipynb` to `01_automobile_demand_forecast.ipynb`** (trailing
-      space in the name breaks shell commands and links) and update the README tree. `git mv` + one README line.
+- [ ] **Add a `plot_forecast` helper to `forecast.py` and save real charts to `outputs/`** (e.g.
+      `outputs/store1_item1_forecast.png`), then swap the placeholder `user-images.githubusercontent.com/example/...`
+      links in the README for them. Add one test that checks the PNG file is written (matplotlib `Agg` backend, stub
+      forecaster, so CI doesn't need Prophet).
 
 ## Housekeeping
-- [ ] Replace the placeholder `user-images.githubusercontent.com/example/...` image links with real charts from `outputs/`
 - [ ] Decide whether the 17 MB `data/train.csv` stays in git (or `.gitignore` it and add a download note)
 - [ ] Delete the five stale weekly-plan branches listed above
 
