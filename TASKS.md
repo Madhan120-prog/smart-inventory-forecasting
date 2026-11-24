@@ -1,6 +1,6 @@
 # Smart Inventory Forecasting: Task List
 
-_Last updated by the weekly review routine: 2026-11-23._
+_Last updated by the weekly review routine: 2026-11-24._
 
 This file replaces the separate weekly-plan branches (`weekly-plan-2026-10-20`,
 `weekly/forecasting-next-steps`, `weekly/next-steps`, `claude/weekly-python-review`,
@@ -36,16 +36,22 @@ so they can be deleted. Track everything here on `feat/forecast-module`.
 
 - [x] Renamed `notebooks/Automobile Demand Forecasting .ipynb` to `notebooks/01_automobile_demand_forecast.ipynb`
       (no more trailing space) and updated the README tree. Tests: 10 passed, 2 skipped (no Prophet); ruff: clean. (2026-11-23)
+- [x] `plot_forecast(history, forecast, path, title)` in `forecast.py` (matplotlib `Agg`, draws observed sales,
+      forecast and the `yhat_lower`/`yhat_upper` band) plus `scripts/plot_forecasts.py`, which renders
+      `outputs/store1_item1_forecast.png` and `outputs/store1_item15_forecast.png` from `data/train.csv`. The README's
+      fake "Top5Items" image now shows these two real charts. New test `test_plot_forecast_writes_png` checks a valid PNG
+      is written; matplotlib 3.11.2 pinned in `requirements.txt` and CI. Tests: 13 passed with Prophet; ruff: clean. (2026-11-24)
 
 ## Next step (pick this up first)
 - [ ] **Open a PR from `feat/forecast-module` into `main` and merge it.** This is still the blocker (carried over
       since October): `main` hasn't changed since 2025-11-10, so none of the module, tests or results show on the public repo.
       Takes ~5 minutes: review the diff on GitHub, then merge.
       The PR now gets a green/red CI check, so you can see the tests pass before merging.
-- [ ] **Add a `plot_forecast` helper to `forecast.py` and save real charts to `outputs/`** (e.g.
-      `outputs/store1_item1_forecast.png`), then swap the placeholder `user-images.githubusercontent.com/example/...`
-      links in the README for them. Add one test that checks the PNG file is written (matplotlib `Agg` backend, stub
-      forecaster, so CI doesn't need Prophet).
+- [ ] **Replace the remaining README placeholder images.** Four `user-images.githubusercontent.com/example/...`
+      links are still fake: the automobile chart (Part 1) and the trend/weekly/yearly components (Part 2). Add a
+      `plot_components` helper (wrap Prophet's `model.plot_components`, so `fit_forecast` needs an option to also return
+      the fitted model), extend `scripts/plot_forecasts.py` to save `outputs/store1_item1_components.png`, and draw the
+      Brake Pads chart from `outputs/Brake Pads_forecast.csv` with the existing `plot_forecast`.
 
 ## Housekeeping
 - [ ] Decide whether the 17 MB `data/train.csv` stays in git (or `.gitignore` it and add a download note)

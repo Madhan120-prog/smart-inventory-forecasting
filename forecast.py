@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Iterable
+from pathlib import Path
 
 import pandas as pd
 
@@ -124,3 +125,47 @@ def backtest_baseline_mape(df: pd.DataFrame, holdout: int = 90, season: int = 7)
     train, test = holdout_split(df, holdout)
     predicted = seasonal_naive_forecast(train["sales"], periods=holdout, season=season)
     return mape(test["sales"].reset_index(drop=True), predicted)
+
+
+def plot_forecast(
+    history: pd.DataFrame,
+    forecast: pd.DataFrame,
+    path: str | Path,
+    title: str = "",
+) -> Path:
+    """Save a PNG of observed sales with the forecast and its interval band.
+
+    Args:
+        history: Observed series with ``date`` and ``sales`` columns.
+        forecast: Frame with ``ds`` and ``yhat`` (and optionally ``yhat_lower``/``yhat_upper``),
+            e.g. the output of :func:`fit_forecast`.
+        path: Where to write the PNG; parent folders are created if needed.
+        title: Optional chart title.
+
+    Returns:
+        The path the chart was written to.
+    """
+    import matplotlib
+
+    matplotlib.use("Agg")  # headless: works in CI and scripts without a display
+    import matplotlib.pyplot as plt
+
+    out = Path(path)
+    out.parent.mkdir(parents=True, exist_ok=True)
+
+    fig, ax = plt.subplots(figsize=(10, 4))
+    ax.plot(pd.to_datetime(history["date"]), history["sales"], lw=0.8, color="0.4", label="Observed")
+    ds = pd.to_datetime(forecast["ds"])
+    ax.plot(ds, forecast["yhat"], lw=1.2, color="tab:blue", label="Forecast")
+    if {"yhat_lower", "yhat_upper"} <= set(forecast.columns):
+        ax.fill_between(ds, forecast["yhat_lower"], forecast["yhat_upper"], color="tab:blue", alpha=0.2,
+                        label="Uncertainty")
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Sales")
+    if title:
+        ax.set_title(title)
+    ax.legend(loc="upper left")
+    fig.tight_layout()
+    fig.savefig(out, dpi=120)
+    plt.close(fig)
+    return out

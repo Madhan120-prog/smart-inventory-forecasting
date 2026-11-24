@@ -90,8 +90,10 @@ For **Store 1**, the model predicted that:
 | ![trend](https://user-images.githubusercontent.com/example/trend.png) | ![weekly](https://user-images.githubusercontent.com/example/weekly.png) | ![yearly](https://user-images.githubusercontent.com/example/yearly.png) |
 
 ### 🧾 Forecast Result  
-![Top5Items](https://user-images.githubusercontent.com/example/top5items.png)  
-*Top 5 forecasted items by demand for Store 1.*
+![Store 1, item 1 forecast](outputs/store1_item1_forecast.png)  
+![Store 1, item 15 forecast](outputs/store1_item15_forecast.png)  
+*Last year of observed sales (grey) and the 90-day Prophet forecast with its uncertainty band (blue) for two Store 1 items.
+Regenerate with `python scripts/plot_forecasts.py`. The top-5 table is in `outputs/store1_top5_forecast_summary.csv`.*
 
 ---
 
@@ -142,7 +144,8 @@ smart-inventory-forecasting/
 │   ├── 01_automobile_demand_forecast.ipynb
 │   └── 02_store_item_demand_forecast.ipynb
 ├── scripts/
-│   └── compare_baseline.py      # Prophet vs seasonal-naive backtest
+│   ├── compare_baseline.py      # Prophet vs seasonal-naive backtest
+│   └── plot_forecasts.py        # renders the forecast charts in outputs/
 ├── tests/
 │   └── test_forecast.py
 ├── data/
@@ -154,6 +157,8 @@ smart-inventory-forecasting/
 │   ├── baseline_comparison.csv
 │   ├── Brake Pads_forecast.csv
 │   ├── product_demand_summary.csv
+│   ├── store1_item1_forecast.png
+│   ├── store1_item15_forecast.png
 │   └── store1_top5_forecast_summary.csv
 ├── requirements.txt             # pinned versions
 ├── TASKS.md

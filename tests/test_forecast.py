@@ -132,3 +132,17 @@ def test_build_forecast_summary_with_prophet_matches_committed_output():
     assert row["Past Sales"] == pytest.approx(expected["Past Sales"], abs=0.01)
     assert row["Forecasted Sales"] == pytest.approx(expected["Forecasted Sales"], abs=0.05)
     assert row["Change"] == pytest.approx(expected["Change"], abs=0.05)
+
+
+def test_plot_forecast_writes_png(tmp_path):
+    pytest.importorskip("matplotlib")
+    from forecast import plot_forecast
+
+    dates = pd.date_range("2020-01-01", periods=30)
+    history = pd.DataFrame({"date": dates[:20], "sales": [10.0 + i % 7 for i in range(20)]})
+    forecast = pd.DataFrame(
+        {"ds": dates, "yhat": [12.0] * 30, "yhat_lower": [10.0] * 30, "yhat_upper": [14.0] * 30}
+    )
+    out = plot_forecast(history, forecast, tmp_path / "charts" / "item.png", title="test")
+    assert out.exists()
+    assert out.read_bytes()[:8] == b"\x89PNG\r\n\x1a\n"
