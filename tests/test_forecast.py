@@ -146,3 +146,15 @@ def test_plot_forecast_writes_png(tmp_path):
     out = plot_forecast(history, forecast, tmp_path / "charts" / "item.png", title="test")
     assert out.exists()
     assert out.read_bytes()[:8] == b"\x89PNG\r\n\x1a\n"
+
+
+def test_plot_components_writes_png(tmp_path):
+    pytest.importorskip("prophet")
+    from forecast import fit_forecast, plot_components
+
+    dates = pd.date_range("2020-01-01", periods=400)
+    history = pd.DataFrame({"date": dates, "sales": [20.0 + (i % 7) + i * 0.01 for i in range(400)]})
+    model, forecast = fit_forecast(history, periods=14, return_model=True)
+    assert len(forecast) == 414
+    out = plot_components(model, forecast, tmp_path / "components.png")
+    assert out.read_bytes()[:8] == b"\x89PNG\r\n\x1a\n"

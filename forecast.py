@@ -9,16 +9,18 @@ import pandas as pd
 Forecaster = Callable[[pd.DataFrame, int], pd.DataFrame]
 
 
-def fit_forecast(df: pd.DataFrame, periods: int = 90) -> pd.DataFrame:
+def fit_forecast(df: pd.DataFrame, periods: int = 90, return_model: bool = False):
     """Fit a Prophet model on one series and forecast ``periods`` days ahead.
 
     Args:
         df: DataFrame with a ``date`` column and a ``sales`` column.
         periods: Number of future days to predict.
+        return_model: If True, return ``(model, forecast)`` instead of just the forecast,
+            so callers can use the fitted model (e.g. :func:`plot_components`).
 
     Returns:
         Prophet's forecast frame (``ds``, ``yhat``, ``yhat_lower``, ...) covering
-        the history plus ``periods`` future days.
+        the history plus ``periods`` future days, or ``(model, forecast)``.
     """
     from prophet import Prophet  # imported lazily so helpers work without it
 
@@ -26,7 +28,8 @@ def fit_forecast(df: pd.DataFrame, periods: int = 90) -> pd.DataFrame:
     model = Prophet()
     model.fit(series)
     future = model.make_future_dataframe(periods=periods)
-    return model.predict(future)
+    forecast = model.predict(future)
+    return (model, forecast) if return_model else forecast
 
 
 def summarize_change(history: pd.DataFrame, forecast: pd.DataFrame, window: int = 90) -> dict[str, float]:
@@ -166,6 +169,30 @@ def plot_forecast(
         ax.set_title(title)
     ax.legend(loc="upper left")
     fig.tight_layout()
+    fig.savefig(out, dpi=120)
+    plt.close(fig)
+    return out
+
+
+def plot_components(model, forecast: pd.DataFrame, path: str | Path) -> Path:
+    """Save Prophet's trend / weekly / yearly components chart as a PNG.
+
+    Args:
+        model: A fitted ``prophet.Prophet`` (from ``fit_forecast(..., return_model=True)``).
+        forecast: The forecast frame that model produced.
+        path: Where to write the PNG; parent folders are created if needed.
+
+    Returns:
+        The path the chart was written to.
+    """
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    out = Path(path)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    fig = model.plot_components(forecast)
     fig.savefig(out, dpi=120)
     plt.close(fig)
     return out

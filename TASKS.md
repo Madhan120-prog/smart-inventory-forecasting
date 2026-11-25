@@ -1,6 +1,6 @@
 # Smart Inventory Forecasting: Task List
 
-_Last updated by the weekly review routine: 2026-11-24._
+_Last updated by the weekly review routine: 2026-11-25._
 
 This file replaces the separate weekly-plan branches (`weekly-plan-2026-10-20`,
 `weekly/forecasting-next-steps`, `weekly/next-steps`, `claude/weekly-python-review`,
@@ -42,16 +42,22 @@ so they can be deleted. Track everything here on `feat/forecast-module`.
       fake "Top5Items" image now shows these two real charts. New test `test_plot_forecast_writes_png` checks a valid PNG
       is written; matplotlib 3.11.2 pinned in `requirements.txt` and CI. Tests: 13 passed with Prophet; ruff: clean. (2026-11-24)
 
+- [x] All README placeholder images replaced. `fit_forecast(..., return_model=True)` now also returns the fitted
+      Prophet model; new `plot_components(model, forecast, path)` saves Prophet's trend/weekly/yearly chart.
+      `scripts/plot_forecasts.py` now also writes `outputs/store1_item1_components.png` and
+      `outputs/brake_pads_forecast.png` (history from `data/sales_data.csv`, forecast from the saved
+      `Brake Pads_forecast.csv`). The components chart confirms the README's "Monday low, weekend high" claim.
+      New test `test_plot_components_writes_png`. Tests: 14 passed with Prophet; ruff: clean. (2026-11-25)
+
 ## Next step (pick this up first)
 - [ ] **Open a PR from `feat/forecast-module` into `main` and merge it.** This is still the blocker (carried over
       since October): `main` hasn't changed since 2025-11-10, so none of the module, tests or results show on the public repo.
       Takes ~5 minutes: review the diff on GitHub, then merge.
       The PR now gets a green/red CI check, so you can see the tests pass before merging.
-- [ ] **Replace the remaining README placeholder images.** Four `user-images.githubusercontent.com/example/...`
-      links are still fake: the automobile chart (Part 1) and the trend/weekly/yearly components (Part 2). Add a
-      `plot_components` helper (wrap Prophet's `model.plot_components`, so `fit_forecast` needs an option to also return
-      the fitted model), extend `scripts/plot_forecasts.py` to save `outputs/store1_item1_components.png`, and draw the
-      Brake Pads chart from `outputs/Brake Pads_forecast.csv` with the existing `plot_forecast`.
+- [ ] **Type-check `forecast.py` with mypy.** Small learning goal: `fit_forecast` now returns either a frame or a
+      `(model, frame)` tuple, which is exactly the kind of thing a type checker should flag. Add `typing.overload`
+      signatures for the two `return_model` cases, add `mypy` to `requirements.txt`, run `mypy forecast.py`, and
+      add it to CI once it passes.
 
 ## Housekeeping
 - [ ] Decide whether the 17 MB `data/train.csv` stays in git (or `.gitignore` it and add a download note)

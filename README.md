@@ -48,8 +48,9 @@ The idea was to help a retailer predict **which automobile components are likely
 - Top 5 items with highest predicted demand were visualized using bar charts.
 
 ### 🖼️ Sample Output  
-![Automobile Forecast Chart](https://user-images.githubusercontent.com/example/automobile_forecast.png)  
-*(Sample visualization of daily predicted demand for Brake Pads)*
+![Brake Pads forecast](outputs/brake_pads_forecast.png)  
+*Daily Brake Pads units sold across all regions (grey) and the notebook's saved 30-day Prophet forecast
+(`outputs/Brake Pads_forecast.csv`, blue). The sales data is synthetic (random daily counts), so the forecast is close to flat.*
 
 ---
 
@@ -85,9 +86,9 @@ For **Store 1**, the model predicted that:
 - Mondays typically have the lowest sales, while weekends peak slightly higher.
 
 ### 🖼️ Forecast Components Example  
-| Trend | Weekly Pattern | Yearly Seasonality |
-|-------|----------------|-------------------|
-| ![trend](https://user-images.githubusercontent.com/example/trend.png) | ![weekly](https://user-images.githubusercontent.com/example/weekly.png) | ![yearly](https://user-images.githubusercontent.com/example/yearly.png) |
+![Store 1, item 1 components: trend, weekly and yearly](outputs/store1_item1_components.png)  
+*Prophet's trend (top), weekly (middle) and yearly (bottom) components for Store 1, item 1: steady growth
+from 2013 to 2018, a Monday low and Sunday high each week, and a mid-summer peak each year.*
 
 ### 🧾 Forecast Result  
 ![Store 1, item 1 forecast](outputs/store1_item1_forecast.png)  
@@ -157,6 +158,8 @@ smart-inventory-forecasting/
 │   ├── baseline_comparison.csv
 │   ├── Brake Pads_forecast.csv
 │   ├── product_demand_summary.csv
+│   ├── brake_pads_forecast.png
+│   ├── store1_item1_components.png
 │   ├── store1_item1_forecast.png
 │   ├── store1_item15_forecast.png
 │   └── store1_top5_forecast_summary.csv
