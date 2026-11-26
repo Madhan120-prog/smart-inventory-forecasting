@@ -3,13 +3,29 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterable
 from pathlib import Path
+from typing import TYPE_CHECKING, Literal, overload
 
 import pandas as pd
+
+if TYPE_CHECKING:
+    from prophet import Prophet
 
 Forecaster = Callable[[pd.DataFrame, int], pd.DataFrame]
 
 
-def fit_forecast(df: pd.DataFrame, periods: int = 90, return_model: bool = False):
+@overload
+def fit_forecast(df: pd.DataFrame, periods: int = ..., return_model: Literal[False] = ...) -> pd.DataFrame: ...
+
+
+@overload
+def fit_forecast(
+    df: pd.DataFrame, periods: int = ..., *, return_model: Literal[True]
+) -> tuple[Prophet, pd.DataFrame]: ...
+
+
+def fit_forecast(
+    df: pd.DataFrame, periods: int = 90, return_model: bool = False
+) -> pd.DataFrame | tuple[Prophet, pd.DataFrame]:
     """Fit a Prophet model on one series and forecast ``periods`` days ahead.
 
     Args:
@@ -174,7 +190,7 @@ def plot_forecast(
     return out
 
 
-def plot_components(model, forecast: pd.DataFrame, path: str | Path) -> Path:
+def plot_components(model: Prophet, forecast: pd.DataFrame, path: str | Path) -> Path:
     """Save Prophet's trend / weekly / yearly components chart as a PNG.
 
     Args:

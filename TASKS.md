@@ -1,6 +1,6 @@
 # Smart Inventory Forecasting: Task List
 
-_Last updated by the weekly review routine: 2026-11-25._
+_Last updated by the weekly review routine: 2026-11-26._
 
 This file replaces the separate weekly-plan branches (`weekly-plan-2026-10-20`,
 `weekly/forecasting-next-steps`, `weekly/next-steps`, `claude/weekly-python-review`,
@@ -49,15 +49,23 @@ so they can be deleted. Track everything here on `feat/forecast-module`.
       `Brake Pads_forecast.csv`). The components chart confirms the README's "Monday low, weekend high" claim.
       New test `test_plot_components_writes_png`. Tests: 14 passed with Prophet; ruff: clean. (2026-11-25)
 
+- [x] mypy type-checking. `fit_forecast` now has two `typing.overload` signatures, so mypy knows
+      `return_model=True` gives `(Prophet, DataFrame)` and the default gives a `DataFrame`. Checked by hand that
+      `fit_forecast(df, return_model=True)["yhat"]` is now an error. `plot_components` takes a typed `Prophet`.
+      `mypy.ini` checks `forecast.py` and `scripts/` (Prophet has no stubs, so its import is ignored). mypy 2.4.1 and
+      pandas-stubs added to `requirements.txt` and CI (`mypy` step after `ruff`). mypy: clean; ruff: clean;
+      tests: 11 passed, 3 skipped (no Prophet). (2026-11-26)
+
 ## Next step (pick this up first)
 - [ ] **Open a PR from `feat/forecast-module` into `main` and merge it.** This is still the blocker (carried over
       since October): `main` hasn't changed since 2025-11-10, so none of the module, tests or results show on the public repo.
       Takes ~5 minutes: review the diff on GitHub, then merge.
       The PR now gets a green/red CI check, so you can see the tests pass before merging.
-- [ ] **Type-check `forecast.py` with mypy.** Small learning goal: `fit_forecast` now returns either a frame or a
-      `(model, frame)` tuple, which is exactly the kind of thing a type checker should flag. Add `typing.overload`
-      signatures for the two `return_model` cases, add `mypy` to `requirements.txt`, run `mypy forecast.py`, and
-      add it to CI once it passes.
+- [ ] **Add a `backtest_all(data, holdout=90)` helper and `outputs/backtest_mape.csv`.** Next learning goal
+      (from issue #1, never done): loop `backtest_mape` and `backtest_baseline_mape` over every store-item in
+      `data/train.csv` (or a `--limit N` subset), write one row per series with both MAPEs, and add a test that uses
+      the stub forecaster so it runs without Prophet. `backtest_mape` calls `fit_forecast` directly, so first give it a
+      `forecaster: Forecaster = fit_forecast` parameter (the same pattern as `build_forecast_summary`). Then add one sentence to the README: on how many series Prophet wins.
 
 ## Housekeeping
 - [ ] Decide whether the 17 MB `data/train.csv` stays in git (or `.gitignore` it and add a download note)
