@@ -158,3 +158,33 @@ def test_plot_components_writes_png(tmp_path):
     assert len(forecast) == 414
     out = plot_components(model, forecast, tmp_path / "components.png")
     assert out.read_bytes()[:8] == b"\x89PNG\r\n\x1a\n"
+
+
+def test_backtest_all_with_stub_forecaster():
+    from forecast import backtest_all
+
+    # Two stores x two items, 28 days each, with a clean weekly pattern scaled per series.
+    weekly = [10, 12, 14, 16, 18, 20, 22]
+    rows = []
+    for store in (1, 2):
+        for item in (1, 2):
+            scale = store * item
+            for day, date in enumerate(pd.date_range("2024-01-01", periods=28)):
+                rows.append({"date": date, "store": store, "item": item, "sales": weekly[day % 7] * scale})
+    data = pd.DataFrame(rows)
+
+    def flat_mean(history: pd.DataFrame, periods: int) -> pd.DataFrame:
+        # Stand-in "model": history (for in-sample rows) followed by the mean, repeated.
+        future = [history["sales"].mean()] * periods
+        return pd.DataFrame({"yhat": list(history["sales"]) + future})
+
+    result = backtest_all(data, holdout=7, forecaster=flat_mean)
+    assert list(result.columns) == ["store", "item", "prophet_mape", "seasonal_naive_mape", "winner"]
+    assert list(zip(result["store"], result["item"])) == [(1, 1), (1, 2), (2, 1), (2, 2)]
+    # Seasonal naive is exact on a perfectly weekly series, so it beats the flat mean everywhere.
+    assert (result["seasonal_naive_mape"] == 0).all()
+    assert (result["prophet_mape"] > 0).all()
+    assert (result["winner"] == "seasonal_naive").all()
+
+    limited = backtest_all(data, holdout=7, limit=2, forecaster=flat_mean)
+    assert len(limited) == 2

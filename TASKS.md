@@ -1,6 +1,6 @@
 # Smart Inventory Forecasting: Task List
 
-_Last updated by the weekly review routine: 2026-11-26._
+_Last updated by the weekly review routine: 2026-11-27._
 
 This file replaces the separate weekly-plan branches (`weekly-plan-2026-10-20`,
 `weekly/forecasting-next-steps`, `weekly/next-steps`, `claude/weekly-python-review`,
@@ -56,16 +56,23 @@ so they can be deleted. Track everything here on `feat/forecast-module`.
       pandas-stubs added to `requirements.txt` and CI (`mypy` step after `ruff`). mypy: clean; ruff: clean;
       tests: 11 passed, 3 skipped (no Prophet). (2026-11-26)
 
+- [x] `backtest_all(data, holdout=90, limit=None, forecaster=None)` in `forecast.py`: backtests Prophet and the
+      seasonal-naive baseline on every store-item pair. `backtest_mape` now takes a `forecaster` argument (same
+      pattern as `build_forecast_summary`), so the new `test_backtest_all_with_stub_forecaster` runs without Prophet.
+      `scripts/backtest_all.py [--limit N]` writes `outputs/backtest_mape.csv`. Result on all 500 series: Prophet wins
+      **500/500**, median MAPE 13.2% vs 25.1%; the store 1/item 1 row matches `baseline_comparison.csv` exactly.
+      README updated. Tests: 15 passed with Prophet; ruff and mypy clean. (2026-11-27)
+
 ## Next step (pick this up first)
 - [ ] **Open a PR from `feat/forecast-module` into `main` and merge it.** This is still the blocker (carried over
       since October): `main` hasn't changed since 2025-11-10, so none of the module, tests or results show on the public repo.
       Takes ~5 minutes: review the diff on GitHub, then merge.
       The PR now gets a green/red CI check, so you can see the tests pass before merging.
-- [ ] **Add a `backtest_all(data, holdout=90)` helper and `outputs/backtest_mape.csv`.** Next learning goal
-      (from issue #1, never done): loop `backtest_mape` and `backtest_baseline_mape` over every store-item in
-      `data/train.csv` (or a `--limit N` subset), write one row per series with both MAPEs, and add a test that uses
-      the stub forecaster so it runs without Prophet. `backtest_mape` calls `fit_forecast` directly, so first give it a
-      `forecaster: Forecaster = fit_forecast` parameter (the same pattern as `build_forecast_summary`). Then add one sentence to the README: on how many series Prophet wins.
+- [ ] **Plot the MAPE distribution from `outputs/backtest_mape.csv`.** Next learning goal: add
+      `plot_mape_distribution(results, path)` to `forecast.py` (two overlaid histograms, Prophet vs seasonal naive,
+      matplotlib `Agg` like `plot_forecast`), a `tests/` check that it writes a PNG, and embed the chart under the
+      "Does Prophet Beat a Simple Baseline?" README section. Then look at the 5 worst Prophet series
+      (max MAPE 31.2%) and write one sentence on what they have in common (low-volume items?).
 
 ## Housekeeping
 - [ ] Decide whether the 17 MB `data/train.csv` stays in git (or `.gitignore` it and add a download note)

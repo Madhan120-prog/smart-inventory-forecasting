@@ -123,6 +123,11 @@ against a seasonal-naive baseline (repeat last week's daily sales). Lower MAPE i
 Prophet roughly halves the baseline's error on every series tested. Reproduce with
 `python scripts/compare_baseline.py` (writes `outputs/baseline_comparison.csv`).
 
+**Across all 500 store-item series** (90-day holdout), Prophet beats the seasonal-naive baseline on
+**500 of 500**, with a median MAPE of **13.2%** vs **25.1%** (mean 14.2% vs 26.1%). Reproduce with
+`python scripts/backtest_all.py` (a few minutes; add `--limit N` for a quick subset), which writes
+`outputs/backtest_mape.csv`.
+
 ---
 
 ## 🛠️ Tools & Libraries Used  
@@ -145,6 +150,7 @@ smart-inventory-forecasting/
 │   ├── 01_automobile_demand_forecast.ipynb
 │   └── 02_store_item_demand_forecast.ipynb
 ├── scripts/
+│   ├── backtest_all.py          # the same backtest on all 500 series
 │   ├── compare_baseline.py      # Prophet vs seasonal-naive backtest
 │   └── plot_forecasts.py        # renders the forecast charts in outputs/
 ├── tests/
@@ -155,6 +161,7 @@ smart-inventory-forecasting/
 │   ├── test.csv
 │   └── sample_submission.csv
 ├── outputs/
+│   ├── backtest_mape.csv
 │   ├── baseline_comparison.csv
 │   ├── Brake Pads_forecast.csv
 │   ├── product_demand_summary.csv

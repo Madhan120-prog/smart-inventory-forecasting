@@ -118,10 +118,14 @@ def holdout_split(df: pd.DataFrame, holdout: int = 90) -> tuple[pd.DataFrame, pd
     return ordered.iloc[:-holdout], ordered.iloc[-holdout:]
 
 
-def backtest_mape(df: pd.DataFrame, holdout: int = 90) -> float:
-    """Fit on all but the last ``holdout`` days and return the MAPE (%) on those days."""
+def backtest_mape(df: pd.DataFrame, holdout: int = 90, forecaster: Forecaster | None = None) -> float:
+    """Fit on all but the last ``holdout`` days and return the MAPE (%) on those days.
+
+    ``forecaster`` defaults to :func:`fit_forecast` (Prophet); tests pass a cheap stand-in.
+    """
     train, test = holdout_split(df, holdout)
-    forecast = fit_forecast(train, periods=holdout)
+    fit = forecaster or fit_forecast
+    forecast = fit(train, holdout)
     predicted = forecast.tail(holdout)["yhat"].reset_index(drop=True)
     return mape(test["sales"].reset_index(drop=True), predicted)
 
@@ -144,6 +148,47 @@ def backtest_baseline_mape(df: pd.DataFrame, holdout: int = 90, season: int = 7)
     train, test = holdout_split(df, holdout)
     predicted = seasonal_naive_forecast(train["sales"], periods=holdout, season=season)
     return mape(test["sales"].reset_index(drop=True), predicted)
+
+
+def backtest_all(
+    data: pd.DataFrame,
+    holdout: int = 90,
+    limit: int | None = None,
+    forecaster: Forecaster | None = None,
+    season: int = 7,
+) -> pd.DataFrame:
+    """Backtest the forecaster and the seasonal-naive baseline on every store-item series.
+
+    Args:
+        data: Long table with ``store``, ``item``, ``date`` and ``sales`` columns (``data/train.csv``).
+        holdout: Days held out at the end of each series for scoring.
+        limit: If set, only the first ``limit`` store-item pairs (sorted by store, then item).
+        forecaster: Defaults to :func:`fit_forecast` (Prophet); tests pass a cheap stand-in.
+        season: Season length for the seasonal-naive baseline.
+
+    Returns:
+        One row per series: ``store``, ``item``, ``prophet_mape``, ``seasonal_naive_mape``,
+        ``winner`` (the layout of ``outputs/baseline_comparison.csv``).
+    """
+    pairs = data[["store", "item"]].drop_duplicates().sort_values(["store", "item"])
+    if limit is not None:
+        pairs = pairs.head(limit)
+    rows = []
+    for store, item in pairs.itertuples(index=False):
+        series = select_series(data, int(store), int(item))
+        model_mape = backtest_mape(series, holdout=holdout, forecaster=forecaster)
+        baseline_mape = backtest_baseline_mape(series, holdout=holdout, season=season)
+        rows.append(
+            {
+                "store": int(store),
+                "item": int(item),
+                "prophet_mape": round(model_mape, 2),
+                "seasonal_naive_mape": round(baseline_mape, 2),
+                "winner": "prophet" if model_mape < baseline_mape else "seasonal_naive",
+            }
+        )
+    columns = ["store", "item", "prophet_mape", "seasonal_naive_mape", "winner"]
+    return pd.DataFrame(rows, columns=columns)
 
 
 def plot_forecast(
